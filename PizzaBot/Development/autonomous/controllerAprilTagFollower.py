@@ -14,13 +14,13 @@ class AprilTagController(AutonomousStateMachine):
     drivetrain : DriveTrainModule
     vision : VisionModule
 
-    kP_linear = 0.1
-    kI_linear = 0
-    kD_linear = 1
+    kP_linear = 1
+    kI_linear = .01
+    kD_linear = .2
 
-    kP_angle = 0.1
-    kI_angle = 0
-    kD_angle = 0
+    kP_angle = 1
+    kI_angle = .01
+    kD_angle = .2
     
     anglePID = None
     distPID = None
@@ -45,8 +45,8 @@ class AprilTagController(AutonomousStateMachine):
             forward_speed = 0
             rotation_speed = 0
         
-        vL = (forward_speed + rotation_speed*0.05)
-        vR = (forward_speed - rotation_speed*0.05)
+        vL = (-forward_speed + rotation_speed)
+        vR = (-forward_speed - rotation_speed)
 
         self.drivetrain.setInput((vL, vR))
 
