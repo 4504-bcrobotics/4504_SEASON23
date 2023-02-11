@@ -2,20 +2,18 @@ from magicbot import AutonomousStateMachine, state, timed_state
 from wpimath.controller import PIDController
 
 from componentsVision import VisionModule
-from componentsLimelight import LimelightModule
 from componentsDrive import DriveTrainModule
 
 from math import sqrt
 
-
-# THIS IS CODED TO WORK WITH THE LIMELIGHT, NOT THE PHOTONVISION MODULE 
+# THIS IS CODED TO WORK WITH THE PHOTONVISION MODULE, NOT THE LIMELIGHT
 class AprilTagController(AutonomousStateMachine):
 
-    MODE_NAME = "AprilTagLimelight"
-    DEFAULT = True
+    MODE_NAME = "AprilTagPhotonvision"
+    DEFAULT = False
 
     drivetrain : DriveTrainModule
-    limelight : LimelightModule
+    vision : VisionModule
 
     kP_linear = 1
     kI_linear = .01
@@ -37,11 +35,12 @@ class AprilTagController(AutonomousStateMachine):
 
     @state(first=True)
     def follow(self):
-        if self.limelight.hasTargets:
-            target_range = self.limelight.getRange()
+        print("Running controllerAprilTagFollower.py")
+        if self.vision.hasTargets():
+            target_range = self.vision.getRange()
             forward_speed = self.linearPID.calculate(target_range, self.goalRange)
 
-            yaw = self.limelight.getX()
+            yaw = self.vision.getYaw()
             rotation_speed = self.anglePID.calculate(yaw, 0)
 
         else:
@@ -50,8 +49,6 @@ class AprilTagController(AutonomousStateMachine):
         
         vL = (-forward_speed + rotation_speed)
         vR = (-forward_speed - rotation_speed)
-        print(self.limelight.getX())
-        print(self.limelight.hasTargets)
 
         self.drivetrain.setInput((vL, vR))
 
