@@ -26,6 +26,7 @@ from componentsColor import ColorModule
 from componentsIMU import IMUModule
 from componentsHMI import HMIModule, FlightStickHMI
 from componentsVision import VisionModule
+from componentsLimelight import LimelightModule
 
 # from componentsIntake import IntakeModule
 #from collections import namedtuple
@@ -38,6 +39,7 @@ class MyRobot(MagicRobot):
     imu : IMUModule
     hmi : HMIModule
     vision : VisionModule
+    limelight : LimelightModule
     
     # intake: IntakeModule
     # Intake_cfg = IntakeConfig(1, 2) # TODO: this might not work... 

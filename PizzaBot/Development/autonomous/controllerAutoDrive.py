@@ -17,11 +17,11 @@ class AutoDriveController(AutonomousStateMachine):
     leftSpeed = 0
     rightSpeed = 0
 
-    kP_dist = 1
+    kP_dist = 10
     kI_dist = 0
     kD_dist = 0
 
-    kP_angle = 1
+    kP_angle = 10
     kI_angle = 0
     kD_angle = 0
     
@@ -41,6 +41,28 @@ class AutoDriveController(AutonomousStateMachine):
         self.anglePID.setTolerance(1, 1)
         self.anglePID.setSetpoint(target_heading)
 
+
+
+    # Arcade drive code from https://xiaoxiae.github.io/Robotics-Simplified-Website/drivetrain-control/arcade-drive/
+    def arcade_drive(self, drive, rotate):
+        """Drives the robot using arcade drive."""
+        # variables to determine the quadrants
+        maximum = max(abs(drive), abs(rotate))
+        total, difference = drive + rotate, drive - rotate
+
+        # set speed according to the quadrant that the values are in
+        if drive >= 0:
+            if rotate >= 0:  # I quadrant
+                return (maximum, difference)
+            else:            # II quadrant
+                return (total, maximum)
+        else:
+            if rotate >= 0:  # IV quadrant
+                return (total, -maximum)
+            else:            # III quadrant
+                return (-maximum, difference)
+
+
     @timed_state(duration=10, first=True, must_finish=True, next_state='stop')
     def update(self):
         # Update PID controller for error
@@ -54,11 +76,9 @@ class AutoDriveController(AutonomousStateMachine):
         angle_out = self.clamp(self.anglePID.calculate(angle_current)/360, -0.5, 0.5)
         dist_out = self.clamp(self.distPID.calculate(dist_current), -0.5, 0.5)
 
-        
-        leftSpeed = dist_out + angle_out
-        rightSpeed = dist_out - angle_out
-        
-        self.drivetrain.setInput((leftSpeed, rightSpeed)) # Fill in arguments to this function
+
+        self.drivetrain.setInput(self.arcade_drive(dist_out, angle_out)) # Fill in arguments to this function
+        print(dist_out, angle_out)
 
         # Go to move state
         if self.is_atTargetHeading():
