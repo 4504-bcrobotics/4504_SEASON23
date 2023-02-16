@@ -113,7 +113,6 @@ class DriveTrainModule:
         dL = self.mainLeft_motor.getDistance()
         dR = self.mainRight_motor.getDistance()
         return (dR, dL)
-        
 
     def enable_autoLockout(self):
         self.autoLockout = True
