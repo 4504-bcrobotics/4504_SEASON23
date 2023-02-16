@@ -1,9 +1,10 @@
 import ctre
 import wpilib
+import rev
 
 class IntakeModule:
-    top_motor: ctre.TalonSRX
-    bottom_motor: ctre.TalonSRX
+    top_motor: rev.CANSparkMax
+    bottom_motor: rev.CANSparkMax
     pneumaticHub: wpilib.PneumaticHub
 
     def __init__(self):
@@ -68,7 +69,7 @@ class IntakeModule:
             self.stateChanged = False
         else:
             pass
-
+#TODO: Configure the motors for SPark Max motor controllers
     def __activateMotors__(self):
         self.bottom_motor.set(ctre._ctre.TalonSRXControlMode.PercentOutput, self.MAX_SPEED_BOTTOM)
         self.top_motor.set(ctre._ctre.TalonSRXControlMode.PercentOutput, self.MAX_SPEED_TOP)
