@@ -1,10 +1,12 @@
 import ctre
 import wpilib
 
+
 class IntakeModule:
     top_motor: ctre.TalonSRX
     bottom_motor: ctre.TalonSRX
     pneumaticHub: wpilib.PneumaticHub
+    # cfg: IntakeConfig
 
     def __init__(self):
         self.topSpeed = 0
