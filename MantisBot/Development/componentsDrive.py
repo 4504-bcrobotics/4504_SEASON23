@@ -1,9 +1,10 @@
 import ctre
 import rev 
 
-import math
+from math import pi
 
 from componentsHMI import FlightStickHMI
+from componentsIMU import IMUModule
 
 class ComboTalonSRX:
     def __init__(self, canID_leader, canID_followers, inverted=False,
@@ -13,7 +14,7 @@ class ComboTalonSRX:
         self.inverted = inverted
         self.mainMotor = None
         self.followerMotors = None
-        self.coefficient = 2*math.pi*wheel_diameter_in*0.0254/ticks_per_rotation
+        self.coefficient = 2*pi*wheel_diameter_in*0.0254/ticks_per_rotation
 
         self.mainMotor = ctre.TalonSRX(self.canID_leader)
         self.mainMotor.setInverted(self.inverted)
@@ -80,6 +81,18 @@ class ComboSparkMax:
     def getVelocity(self):
         vel = self.mainEncoder.getVelocity() #rpm
         return vel
+    
+    def getPosition(self):
+        enc = self.mainEncoder.getPosition()
+        return enc
+
+    def getContoller(self):
+        con = self.mainMotor.getPIDController()
+        return con 
+
+    def resetEncoder(self):
+        self.mainEncoder.setPosition(0)
+        return False
 
 class DriveTrainModule:
     mainLeft_motor: ComboSparkMax
@@ -87,12 +100,40 @@ class DriveTrainModule:
     # mainLeft_motor: ComboTalonSRX
     # mainRight_motor: ComboTalonSRX
     hmi_interface: FlightStickHMI
+    imu : IMUModule
+
+    tol = 0.1
+    kP = 0.1
+    kI = 1e-4
+    kD = 1
+    kIz = 0 
+    kFF = 0 
+    kMaxOutput = 1 
+    kMinOutput = -1
+    wheelDiameter_in = 2.5
 
     def __init__(self):
         self.fsR = 0
         self.fsL = 0
         self.changed = False
         self.autoLockout = True
+        self.targetDistance = 0
+        self.currentDistance = 0
+        self.stateChanged = False
+        self.controllerLeft = self.__setupDistanceController__(self.mainLeft_motor)
+        self.controllerRight = self.__setupDistanceController__(self.mainRight_motor)
+
+
+    def __setupDistanceController__(self, motor):
+        controller = motor.getController()
+        # set PID coefficients
+        controller.setP(self.kP)
+        controller.setI(self.kI)
+        controller.setD(self.kD)
+        controller.setIZone(self.kIz)
+        controller.setFF(self.kFF)
+        controller.setOutputRange(self.kMinOutput, self.kMaxOutput)
+        return controller
 
     def setInput(self, fsTuple): # fsTuple = (fsL, fsR)
         self.fsL = fsTuple[0]
@@ -131,9 +172,46 @@ class DriveTrainModule:
         self.mainRight_motor.setPercent(self.fsR)
         self.changed = False
         return False
+    
+    def setDistance(self, distance_m):
+        self.targetDistance = distance_m
+        self.controllerLeft.resetController()
+        self.controllerRight.resetController()
+        self.enable_autoLockout()
+        self.stateChanged = True
+        return False
+
+    def getDistance(self):
+        self.currentDistance = self.mainLeft_motor.getPosition()
+        return False
+    
+    def __setMotorsDistance__(self):
+        rotations = (self.targetDistance-self.currentDistance)/(self.wheelDiameter_in/25.4e-3*pi)
+        self.controllerLeft.setReference(rotations, rev.CANSparkMax.ControlType.kPosition)
+        self.controllerRight.setReference(rotations, rev.CANSparkMax.ControlType.kPosition)
+    
+    def isAtDistance(self):
+        if abs(self.currentDistance - self.targetDistance) < self.tol:
+            self.currentDistance = 0
+            self.targetDistance = 0
+            self.disable_autoLockout()
+            return True
+                
+        return False
+    
+    # def setAngle(self, angle_rad):
+    
+    # def isAtAngle(self):
+        
 
     def execute(self):
         '''This gets called at the end of the control loop'''
+        self.getDistance()
+
+        if self.stateChanged:
+            self.__setMotorsDistance__()
+            self.stateChanged = False
+
         if not self.is_autoLockoutActive():
             self.getHMIInput()
             self.setMotors()
