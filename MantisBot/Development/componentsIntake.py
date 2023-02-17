@@ -1,14 +1,10 @@
 import ctre
 import wpilib
-import rev
-from componentsDrive import ComboSparkMax, DriveTrainModule
-
 
 class IntakeModule:
-    top_motor: ComboSparkMax
-    bottom_motor: ComboSparkMax
+    top_motor: ctre.TalonSRX
+    bottom_motor: ctre.TalonSRX
     pneumaticHub: wpilib.PneumaticHub
-    # cfg: IntakeConfig
 
     def __init__(self):
         self.topSpeed = 0
@@ -72,10 +68,10 @@ class IntakeModule:
             self.stateChanged = False
         else:
             pass
-#TODO: Configure the motors for Spark Max motor controllers
+
     def __activateMotors__(self):
-        self.bottom_motor.set(rev.CANSparkMax.ControlType.kPercentOutput, self.MAX_SPEED_BOTTOM)
-        self.top_motor.set(rev.CANSparkMax.ControlType.kPercentOutput, self.MAX_SPEED_TOP)
+        self.bottom_motor.set(ctre._ctre.TalonSRXControlMode.PercentOutput, self.MAX_SPEED_BOTTOM)
+        self.top_motor.set(ctre._ctre.TalonSRXControlMode.PercentOutput, self.MAX_SPEED_TOP)
         return False
     
     def __deactivateMotors__(self):

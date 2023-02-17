@@ -1,17 +1,13 @@
 {
-  "Docking": {
-    "Data": []
-  },
   "MainWindow": {
     "GLOBAL": {
-      "fps": "120",
       "height": "900",
       "maximized": "0",
-      "style": "2",
+      "style": "0",
       "userScale": "2",
       "width": "1600",
-      "xpos": "125",
-      "ypos": "57"
+      "xpos": "41",
+      "ypos": "70"
     }
   },
   "Window": {
@@ -34,11 +30,6 @@
       "Collapsed": "0",
       "Pos": "1281,25",
       "Size": "312,868"
-    },
-    "###RoboRIO": {
-      "Collapsed": "0",
-      "Pos": "5,125",
-      "Size": "141,164"
     },
     "###System Joysticks": {
       "Collapsed": "0",
