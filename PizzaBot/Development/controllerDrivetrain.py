@@ -1,3 +1,5 @@
+# OUTDATED - REPLACED BY drivetrainController.py
+
 import time
 from math import sin, cos
 

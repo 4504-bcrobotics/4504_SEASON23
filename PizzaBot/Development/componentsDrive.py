@@ -40,7 +40,7 @@ class DriveTrainModule:
         self.rightSpeedChanged = False           
 
     def setLeft(self, value):
-        self.leftSpeed = value
+        self.leftSpeed = value*.4           #TODO: Remove .4 when used with comp bot
         self.leftSpeedChanged = True
         
     def setRight(self, value):
@@ -52,6 +52,30 @@ class DriveTrainModule:
     
     def is_rightChanged(self):
         return self.rightSpeedChanged
+
+    # Arcade drive code from https://xiaoxiae.github.io/Robotics-Simplified-Website/drivetrain-control/arcade-drive/
+    def setArcade(self, drive, rotate):
+        """Drives the robot using arcade drive."""
+        # variables to determine the quadrants
+        maximum = max(abs(drive), abs(rotate))
+        total, difference = drive + rotate, drive - rotate
+
+        # set speed according to the quadrant that the values are in
+        if drive >= 0:
+            if rotate >= 0:  # I quadrant
+                self.setLeft(maximum)
+                self.setRight(difference)
+            else:            # II quadrant
+                self.setLeft(total)
+                self.setRight(maximum)
+        else:
+            if rotate >= 0:  # IV quadrant
+                self.setLeft(total)
+                self.setRight(-maximum)
+            else:            # III quadrant
+                self.setLeft(-maximum)
+                self.setRight(difference)
+
 
     def execute(self):
         '''This gets called at the end of the control loop'''

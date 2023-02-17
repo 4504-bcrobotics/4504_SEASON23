@@ -9,19 +9,16 @@
 #		    _/    _/_/_/      _/        _/ 
 """
 
-
-"""
-    This is a demo program showing the use of the RobotDrive class,
-    specifically it contains the code necessary to operate a robot with
-    arcade drive.
-"""
 from magicbot import MagicRobot
 import wpilib
 import rev
 import ctre
+import photonvision
 from componentsDrive import DriveTrainModule, ComboTalonSRX
 from componentsColor import ColorModule
 from componentsIMU import IMUModule
+from componentsVision import VisionModule
+from componentsLimelight import LimelightModule
 # from componentsIntake import IntakeModule
 #from collections import namedtuple
 
@@ -31,6 +28,8 @@ class MyRobot(MagicRobot):
     drivetrain: DriveTrainModule
     color: ColorModule
     imu: IMUModule
+    vision: VisionModule
+    limelight: LimelightModule
     # intake: IntakeModule
     # Intake_cfg = IntakeConfig(1, 2) # TODO: this might not work... 
     
@@ -46,6 +45,9 @@ class MyRobot(MagicRobot):
         """Drivetrain Motor Configuration"""
         self.mainLeft_motor = ComboTalonSRX(6, [4,5], inverted=False)
         self.mainRight_motor = ComboTalonSRX(2, [1,3], inverted=True)
+
+        """Camera Configurtation"""
+        self.camera = photonvision.PhotonCamera('MSWebCam')
 
         """Sensor Setups"""
         self.colorSensor = rev.ColorSensorV3(wpilib.I2C.Port.kOnboard)
