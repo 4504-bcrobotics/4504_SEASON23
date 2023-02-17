@@ -1,7 +1,6 @@
 from magicbot import AutonomousStateMachine, state, timed_state
 from wpimath.controller import PIDController
 
-from componentsVision import VisionModule
 from componentsLimelight import LimelightModule
 from componentsDrive import DriveTrainModule
 
@@ -12,7 +11,7 @@ from math import sqrt
 class AprilTagController(AutonomousStateMachine):
 
     MODE_NAME = "AprilTagLimelight"
-    DEFAULT = True
+    DEFAULT = False
 
     drivetrain : DriveTrainModule
     limelight : LimelightModule
