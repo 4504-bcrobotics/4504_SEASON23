@@ -45,12 +45,12 @@ class AlignAprilTagController(StateMachine):
     def state_moveFirstLeg(self):
         target_distance = self.targetDistance_m*cos(self.targetAngle_rad)
 
-        # set PID controller for motor move distance
-
         # Move target_distance
+        self.drivetrain.setDistance(target_distance)
 
         # If distance is reached
-        self.next_state_now('state_moveNeg90')
+        if self.drivetrain.isAtDistance():
+            self.next_state_now('state_moveNeg90')
 
     state(must_finish=True)
     def state_rotateNeg90(self):
@@ -61,18 +61,17 @@ class AlignAprilTagController(StateMachine):
         # If angle is reached
         self.next_state_now('state_moveSecondLeg')
 
+    state(must_finish=True)
     def state_moveSecondLeg(self):
         target_distance = self.targetDistance_m*sin(self.targetAngle_rad)
         target_distance -= self.offset_m
 
-        # set PID controller for motor move distance
-
         # Move target_distance
+        self.drivetrain.setDistance(target_distance)
 
         # If distance is reached
-        self.engaged = False
-        self.next_state_now('state_moveNeg90')
-
+        if self.drivetrain.isAtDistance():            
+            self.engaged = False
 
     def is_engaged(self):
         return self.engaged
