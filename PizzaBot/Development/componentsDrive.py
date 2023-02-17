@@ -58,7 +58,7 @@ class ComboSparkMax:
         if motorType == 'brushless':
             mtype = rev.CANSparkMaxLowLevel.MotorType.kBrushless
         else:
-            mtype = rev.CANSparkMaxLowLevel.MotorType.kBrushed # FIXME!: Is this right?
+            mtype = rev.CANSparkMaxLowLevel.MotorType.kBrushed # FIXME!: Is this right? 
 
         self.mainMotor = rev.CANSparkMax(canID_leader, mtype)
         self.mainMotor.setInverted(self.inverted)
@@ -82,10 +82,10 @@ class ComboSparkMax:
         return vel
 
 class DriveTrainModule:
-    # mainLeft_motor: ComboSparkMax
-    # mainRight_motor: ComboSparkMax
-    mainLeft_motor: ComboTalonSRX
-    mainRight_motor: ComboTalonSRX
+    mainLeft_motor: ComboSparkMax
+    mainRight_motor: ComboSparkMax
+    # mainLeft_motor: ComboTalonSRX
+    # mainRight_motor: ComboTalonSRX
     hmi_interface: FlightStickHMI
 
     def __init__(self):

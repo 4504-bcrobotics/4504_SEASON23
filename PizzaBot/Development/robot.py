@@ -27,9 +27,10 @@ from componentsIMU import IMUModule
 from componentsHMI import HMIModule, FlightStickHMI
 from componentsVision import VisionModule
 from componentsLimelight import LimelightModule
+from componentsGrabber import GrabberModule
 
-# from componentsIntake import IntakeModule
-#from collections import namedtuple
+from componentsIntake import IntakeModule
+from collections import namedtuple
 
 # IntakeConfig = namedtuple("IntakeConfig", ["channelA", "channelB"])
 class MyRobot(MagicRobot):
@@ -40,18 +41,20 @@ class MyRobot(MagicRobot):
     hmi : HMIModule
     vision : VisionModule
     limelight : LimelightModule
-    
-    # intake: IntakeModule
-    # Intake_cfg = IntakeConfig(1, 2) # TODO: this might not work... 
+    intake: IntakeModule
+    grabber: GrabberModule
     
 
+    # Intake_cfg = IntakeConfig(1, 2) # TODO: this might not work... 
+    
+# rev._rev.CANSparkMax(8, rev._rev.CANSparkMaxLowLevel.MotorType.kBrushless)
     def createObjects(self):
         """Robot initialization function"""
         
         """Intake Motor Configuration"""
-        # self.top_motor = ctre.TalonSRX(7)
-        # self.bottom_motor = ctre.TalonSRX(8)
-        # self.pneumatic_hub = wpilib.PneumaticHub(11)
+        self.top_motor =  ComboSparkMax(7,[8], inverted=False)
+        self.bottom_motor = ComboSparkMax(8, [7], inverted=False, motorType='brushless')
+        self.pneumatic_hub = wpilib.PneumaticHub(11)
         
         """Drivetrain Motor Configuration"""
         # self.mainLeft_motor = ComboSparkMax(6, [4,5], inverted=False)
