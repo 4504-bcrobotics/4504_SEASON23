@@ -82,10 +82,10 @@ class ComboSparkMax:
         return vel
 
 class DriveTrainModule:
-    # mainLeft_motor: ComboSparkMax
-    # mainRight_motor: ComboSparkMax
-    mainLeft_motor: ComboTalonSRX
-    mainRight_motor: ComboTalonSRX
+    mainLeft_motor: ComboSparkMax
+    mainRight_motor: ComboSparkMax
+    # mainLeft_motor: ComboTalonSRX
+    # mainRight_motor: ComboTalonSRX
     hmi_interface: FlightStickHMI
 
     def __init__(self):
@@ -113,7 +113,6 @@ class DriveTrainModule:
         dL = self.mainLeft_motor.getDistance()
         dR = self.mainRight_motor.getDistance()
         return (dR, dL)
-        
 
     def enable_autoLockout(self):
         self.autoLockout = True
