@@ -23,12 +23,7 @@ class GrabberSparkMax:
         self.followerMotors = None
         self.coefficient = 2*math.pi*wheel_diameter_in*0.0254/ticks_per_rotation
 
-        if motorType == 'brushless':
-            mtype = rev.CANSparkMaxLowLevel.MotorType.kBrushless
-        else:
-            mtype = rev.CANSparkMaxLowLevel.MotorType.kBrushed
-
-        self.mainMotor = rev.CANSparkMax(canID_leader, mtype)
+        self.mainMotor = rev.CANSparkMax(canID_leader, rev.CANSparkMaxLowLevel.MotorType.kBrushless)
         self.mainMotor.setInverted(inverted)
         self.mainEncoder = self.mainMotor.getEncoder(rev.SparkMaxRelativeEncoder.Type.kHallSensor, 42)
 
@@ -69,19 +64,20 @@ class GrabberModule:
         self.nextPosition = 0
         self.currentLevel = 0
         self.nextLevel = 0
-        self.controller = self.__setupController__()
         self.coefficient = math.pi*self.sprocketDiameter_in/25.3e-3 # m/cycle
-
-        self.solenoid = self.__setUpDoubleSolenoid__()
         self.isOpen = False
         self.stateChanged = False
 
+    def setup(self):
+        self.controller = self.__setupController__()
+        self.solenoid = self.__setUpDoubleSolenoid__()
+
     def __setUpPneumaticHub__(self):
-        self.pneumaticHub.clearStickyFaults()
+        self.grabber_pneumatics.clearStickyFaults()
         return False
     
     def __setUpDoubleSolenoid__(self):
-        doubleSolenoid = self.pneumaticHub.makeDoubleSolenoid(self.PNEUMATIC_FORWARD_CHANNEL, 
+        doubleSolenoid = self.grabber_pneumatics.makeDoubleSolenoid(self.PNEUMATIC_FORWARD_CHANNEL, 
                                                               self.PNEUMATIC_REVERSE_CHANNEL)
         return doubleSolenoid
 
@@ -128,12 +124,12 @@ class GrabberModule:
         return False
 
     def __openGrabber__(self):
-        self.doubleSolenoid.set(wpilib.DoubleSolenoid.Value.kForward) #forward = 1, reverse = 2, off = 0
+        self.solenoid.set(wpilib.DoubleSolenoid.Value.kForward) #forward = 1, reverse = 2, off = 0
         self.isOpen = True
         return False
         
     def __closeGrabber__(self):
-        self.doubleSolenoid.set(wpilib.DoubleSolenoid.Value.kReverse)
+        self.solenoid.set(wpilib.DoubleSolenoid.Value.kReverse)
         self.isOpen = False
         return False
 

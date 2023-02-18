@@ -75,9 +75,11 @@ class ElevatorModule:
         self.nextPosition = 0
         self.currentLevel = 0
         self.nextLevel = 0
-        self.controller = self.__setupController__()
         self.coefficient = math.pi*self.sprocketDiameter_in/25.3e-3 # m/cycle
         self.stateChanged = False
+    
+    def setup(self):
+        self.controller = self.__setupController__()
 
     def __setupController__(self):
         controller = self.elevator_motor.getController()

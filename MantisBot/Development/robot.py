@@ -54,9 +54,9 @@ class MyRobot(MagicRobot):
         """Robot initialization function"""
         
         """Intake Motor Configuration"""
-        self.pneumatic_hub = wpilib.PneumaticHub(11)
-        self.grabber_motor = GrabberSparkMax(12)
-        self.elevator_motor = ElevatorSparkMax(13)
+        self.grabber_pneumatics= wpilib.PneumaticHub(11)
+        self.grabber_motor = GrabberSparkMax(12, [])
+        self.elevator_motor = ElevatorSparkMax(13, [])
         
         """Drivetrain Motor Configuration"""
         self.mainLeft_motor = ComboSparkMax(6, [4,5], inverted=False)

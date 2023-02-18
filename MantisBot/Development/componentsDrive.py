@@ -63,7 +63,7 @@ class ComboSparkMax:
 
         self.mainMotor = rev.CANSparkMax(canID_leader, mtype)
         self.mainMotor.setInverted(self.inverted)
-        self.mainEncoder = self.mainMotor.getEncoder(rev.SparkMaxRelativeEncoder.Type.kQuadrature, 4096)
+        self.mainEncoder = self.mainMotor.getEncoder(rev.SparkMaxRelativeEncoder.Type.kHallSensor, 42)
 
         followerMotors = []
         for canID in self.canID_followers:
@@ -120,9 +120,10 @@ class DriveTrainModule:
         self.targetDistance = 0
         self.currentDistance = 0
         self.stateChanged = False
+
+    def setup(self):
         self.controllerLeft = self.__setupDistanceController__(self.mainLeft_motor)
         self.controllerRight = self.__setupDistanceController__(self.mainRight_motor)
-
 
     def __setupDistanceController__(self, motor):
         controller = motor.getController()
