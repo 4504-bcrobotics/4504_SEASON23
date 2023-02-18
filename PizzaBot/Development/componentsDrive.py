@@ -53,12 +53,13 @@ class ComboSparkMax:
 
         if motorType == 'brushless':
             mtype = rev.CANSparkMaxLowLevel.MotorType.kBrushless
+            
         else:
             mtype = rev.CANSparkMaxLowLevel.MotorType.kBrushed # FIXME!: Is this right? 
 
         self.mainMotor = rev.CANSparkMax(canID_leader, mtype)
         self.mainMotor.setInverted(self.inverted)
-        self.mainEncoder = self.mainMotor.getEncoder(rev.SparkMaxRelativeEncoder.Type.kQuadrature, 4096)
+        self.mainEncoder = self.mainMotor.getEncoder(rev.SparkMaxRelativeEncoder.Type.kHallSensor, 42)
 
         followerMotors = []
         for canID in self.canID_followers:

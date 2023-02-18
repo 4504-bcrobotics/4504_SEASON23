@@ -1,6 +1,6 @@
 from magicbot import StateMachine, state, timed_state
 from componentsIntake import IntakeModule
-# from componentsElevator import ElevatorModule
+from componentsElevator import ElevatorModule
 
 class PlacementController(StateMachine):
     elevator: ElevatorModule

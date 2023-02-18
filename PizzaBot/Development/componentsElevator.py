@@ -1,23 +1,23 @@
 import rev 
 import math
-import wpilib
 
-GrabberLevelDict_m = {
+ElevatorLevelDict_m = {
     0: 0,
     1: 0.35,
     2: 0.65,
     3: 1.0,
 }
 
-def rotationsToNextLevel(current_level, next_level):
-    assert current_level in GrabberLevelDict_m.keys(), '[+] ERROR: current level argument not a valid level'
-    assert next_level in GrabberLevelDict_m.keys(), '[+] ERROR: next level argument not a valid level'
-    return GrabberLevelDict_m[next_level] - GrabberLevelDict_m[current_level]
+def positionToNextLevel(current_level, next_level):
+    assert current_level in ElevatorLevelDict_m.keys(), '[+] ERROR: current level argument not a valid level'
+    assert next_level in ElevatorLevelDict_m.keys(), '[+] ERROR: next level argument not a valid level'
+    return ElevatorLevelDict_m[next_level] - ElevatorLevelDict_m[current_level]
 
-class GrabberSparkMax:
-    def __init__(self, canID_leader, motorType='brushless', inverted=False,
+class ElevatorSparkMax:
+    def __init__(self, canID_leader, canID_followers, motorType='brushless', inverted=False,
                 wheel_diameter_in=6.5, ticks_per_rotation=42):
         self.canID_leader = canID_leader
+        self.canID_followers = canID_followers
         self.inverted = inverted
         self.mainMotor = None
         self.followerMotors = None
@@ -32,6 +32,15 @@ class GrabberSparkMax:
         self.mainMotor.setInverted(inverted)
         self.mainEncoder = self.mainMotor.getEncoder(rev.SparkMaxRelativeEncoder.Type.kHallSensor, 42)
 
+        followerMotors = []
+        for canID in self.canID_followers:
+            follower = rev.CANSparkMax(canID, mtype)
+            follower.setInverted(not inverted)
+            follower.follow(self.mainMotor)                              
+            followerMotors.append(follower)
+
+        self.followerMotors = followerMotors
+
     def getPosition(self):
         enc = self.mainEncoder.getPosition()
         return enc
@@ -44,15 +53,12 @@ class GrabberSparkMax:
         self.mainEncoder.setPosition(0)
         return False
 
-
-
-class GrabberModule:
+class ElevatorModule:
     '''
     REFERENCE: https://github.com/REVrobotics/SPARK-MAX-Examples/blob/master/Java/Position%20Closed%20Loop%20Control/src/main/java/frc/robot/Robot.java
     '''
 
-    grabber_motor: GrabberSparkMax
-    pneumaticsHub: wpilib.PneumaticHub
+    elevator_motor: ElevatorSparkMax
 
     tol = 0.1
     kP = 0.1
@@ -71,22 +77,11 @@ class GrabberModule:
         self.nextLevel = 0
         self.controller = self.__setupController__()
         self.coefficient = math.pi*self.sprocketDiameter_in/25.3e-3 # m/cycle
-
-        self.solenoid = self.__setUpDoubleSolenoid__()
-        self.isOpen = False
         self.stateChanged = False
-
-    def __setUpPneumaticHub__(self):
-        self.pneumaticsHub.clearStickyFaults()
-        return False
-    
-    def __setUpDoubleSolenoid__(self):
-        doubleSolenoid = self.pneumaticsHub.makeDoubleSolenoid(self.PNEUMATIC_FORWARD_CHANNEL, 
-                                                              self.PNEUMATIC_REVERSE_CHANNEL)
-        return doubleSolenoid
+        
 
     def __setupController__(self):
-        controller = self.grabber_motor.getController()
+        controller = self.elevator_motor.getController()
         # set PID coefficients
         controller.setP(self.kP)
         controller.setI(self.kI)
@@ -106,18 +101,14 @@ class GrabberModule:
         self.__setRotations__(rotations)
         return False
 
-    def setLevel(self, next_level):
-        if next_level not in GrabberLevelDict_m.keys():
-            return True
-
-        self.nextElevatorLevel = next_level
-        position = rotationsToNextLevel(self.currentLevel, next_level)
-
+    def goToNextLevel(self, next_level):
+        position = positionToNextLevel(self.currentLevel, self.nextLevel)
         self.nextElevatorPosition = position
         self.__setPosition__(position)
+        return False
 
     def getPosition(self):
-        self.currentElevatorPosition = self.grabber_motor.getPosition()
+        self.currentElevatorPosition = self.elevator_motor.getPosition()
         return False
 
     def isAtLevel(self):
@@ -127,40 +118,19 @@ class GrabberModule:
 
         return False
 
-    def __openGrabber__(self):
-        self.doubleSolenoid.set(wpilib.DoubleSolenoid.Value.kForward) #forward = 1, reverse = 2, off = 0
-        self.isOpen = True
-        return False
-        
-    def __closeGrabber__(self):
-        self.doubleSolenoid.set(wpilib.DoubleSolenoid.Value.kReverse)
-        self.isOpen = False
-        return False
-
-    def is_stateChanged(self):
-        return self.stateChanged
-
-    def is_open(self):
-        return self.isOpen
-
-    def setOpen(self):
+    def setNextLevel(self, next_level):
+        if next_level not in ElevatorLevelDict_m.keys():
+            return True
         self.stateChanged = True
-        self.isOpen = True
-
-    def setClosed(self):
-        self.stateChanged = True
-        self.isOpen = False
+        self.nextElevatorLevel = next_level
 
     def execute(self):
-        # Update grabber position
+        # Update elevator position
         self.getPosition()
 
-        # Check if state has changed
+        # Move level if needed
         if self.stateChanged:
-            if self.isOpen:
-                self.__openGrabber__()
-            else:
-                self.__closeGrabber__()
+            self.goToNextLevel()
             self.stateChanged = False
-            
+
         pass

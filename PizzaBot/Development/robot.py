@@ -10,10 +10,10 @@
 """
 
 
-"""
-    This is a demo program showing the use of the RobotDrive class,
-    specifically it contains the code necessary to operate a robot with
-    arcade drive.
+""""
+    This is where all of our robot code 
+    is pulled together from component modules to
+     define the behavior of diffrent components
 """
 from magicbot import MagicRobot
 import wpilib
@@ -28,7 +28,6 @@ from componentsHMI import HMIModule, FlightStickHMI
 from componentsVision import VisionModule
 from componentsLimelight import LimelightModule
 from componentsGrabber import GrabberModule
-
 from componentsIntake import IntakeModule
 from collections import namedtuple
 
@@ -42,7 +41,7 @@ class MyRobot(MagicRobot):
     vision : VisionModule
     limelight : LimelightModule
     intake: IntakeModule
-    grabber: GrabberModule
+    # grabber: GrabberModule
     
 
     # Intake_cfg = IntakeConfig(1, 2) # TODO: this might not work... 
@@ -52,8 +51,8 @@ class MyRobot(MagicRobot):
         """Robot initialization function"""
         
         """Intake Motor Configuration"""
-        self.top_motor =  ComboSparkMax(7,[8], inverted=False)
-        self.bottom_motor = ComboSparkMax(8, [7], inverted=False, motorType='brushless')
+        self.top_motor =  ComboSparkMax(7,[], inverted=False)
+        self.bottom_motor = ComboSparkMax(8, [], inverted=False)
         self.pneumatic_hub = wpilib.PneumaticHub(11)
         
         """Drivetrain Motor Configuration"""
@@ -61,6 +60,11 @@ class MyRobot(MagicRobot):
         # self.mainRight_motor = ComboSparkMax(2, [1,3], inverted=True)
         self.mainLeft_motor = ComboTalonSRX(6, [4,5], inverted=False)
         self.mainRight_motor = ComboTalonSRX(2, [1,3], inverted=True)
+
+        """"Grabber Setup"""
+        
+        """Elevator Setup"""
+        
         """Sensor Setups"""
         self.colorSensor = rev.ColorSensorV3(wpilib.I2C.Port.kOnboard)
         
