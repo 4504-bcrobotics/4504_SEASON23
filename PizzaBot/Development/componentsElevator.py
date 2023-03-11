@@ -1,5 +1,5 @@
 import rev 
-import math
+from math import pi 
 
 ElevatorLevelDict_m = {
     0: 0,
@@ -15,13 +15,13 @@ def positionToNextLevel(current_level, next_level):
 
 class ElevatorSparkMax:
     def __init__(self, canID_leader, canID_followers, motorType='brushless', inverted=False,
-                wheel_diameter_in=6.5, ticks_per_rotation=42):
+            sprocket_diameter_in=1.5, ticks_per_rotation=42):
         self.canID_leader = canID_leader
         self.canID_followers = canID_followers
         self.inverted = inverted
         self.mainMotor = None
         self.followerMotors = None
-        self.coefficient = 2*math.pi*wheel_diameter_in*0.0254/ticks_per_rotation
+        self.coefficient = 2*pi*sprocket_diameter_in*0.0254/ticks_per_rotation
 
         if motorType == 'brushless':
             mtype = rev.CANSparkMaxLowLevel.MotorType.kBrushless
@@ -76,7 +76,7 @@ class ElevatorModule:
         self.currentLevel = 0
         self.nextLevel = 0
         self.controller = self.__setupController__()
-        self.coefficient = math.pi*self.sprocketDiameter_in/25.3e-3 # m/cycle
+        self.coefficient = pi*self.sprocketDiameter_in/25.3e-3 # m/cycle
         self.stateChanged = False
         
 
